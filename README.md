@@ -39,6 +39,16 @@ This demo is intended to run locally. The frontend is not deployed live for this
 
 If the frontend is deployed to Vercel for demo purposes, set the Vercel project `Root Directory` to `frontend`. Deploying from the repository root will produce a Vercel `404: NOT_FOUND` because the Next.js app is not located at the root.
 
+Vercel settings for this repo:
+
+- Framework Preset: `Next.js`
+- Root Directory: `frontend`
+- Install Command: `npm install`
+- Build Command: `npm run build`
+- Output Directory: leave empty/default
+
+Do not set the Output Directory to `public`. This is a Next.js app, not a static site. If Vercel shows `No Output Directory named "public" found after the Build completed`, remove `public` from the Output Directory setting and redeploy.
+
 ## Environment Variables
 
 - `DATABASE_URL`: PostgreSQL connection string used by the backend.
