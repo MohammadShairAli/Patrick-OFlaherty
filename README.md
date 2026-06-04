@@ -37,6 +37,8 @@ Create local environment files from `.env.example`.
 
 This demo is intended to run locally. The frontend is not deployed live for this submission. The backend is written to be deployable to AWS Lambda/API Gateway, but actual AWS deployment is documented only.
 
+If the frontend is deployed to Vercel for demo purposes, set the Vercel project `Root Directory` to `frontend`. Deploying from the repository root will produce a Vercel `404: NOT_FOUND` because the Next.js app is not located at the root.
+
 ## Environment Variables
 
 - `DATABASE_URL`: PostgreSQL connection string used by the backend.
