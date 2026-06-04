@@ -47,7 +47,7 @@ Vercel settings for this repo:
 - Build Command: `npm run build`
 - Output Directory: leave empty/default
 
-Do not set the Output Directory to `public`. This is a Next.js app, not a static site. If Vercel shows `No Output Directory named "public" found after the Build completed`, remove `public` from the Output Directory setting and redeploy.
+Do not set the Output Directory to `public`. This is a Next.js app, not a static site. If Vercel shows `No Output Directory named "public" found after the Build completed`, remove `public` from the Output Directory setting and redeploy. The frontend also includes `frontend/vercel.json`, which sets the Vercel output directory to `.next`.
 
 ## Environment Variables
 
