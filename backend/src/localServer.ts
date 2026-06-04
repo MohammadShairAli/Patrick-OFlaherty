@@ -2,7 +2,8 @@ import { createServer } from "http";
 import { config } from "dotenv";
 import { resolve } from "path";
 import type { APIGatewayProxyEventV2 } from "aws-lambda";
-import { handler } from "./handlers/createListing";
+import { handler as createListing } from "./handlers/createListing";
+import { handler as listListings } from "./handlers/listListings";
 
 config({ path: resolve(process.cwd(), "../.env") });
 config({ path: resolve(process.cwd(), ".env") });
@@ -24,11 +25,25 @@ async function getRequestBody(
 const server = createServer(async (request, response) => {
   response.setHeader("Access-Control-Allow-Origin", "*");
   response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 
   if (request.method === "OPTIONS") {
     response.writeHead(204);
     response.end();
+    return;
+  }
+
+  if (request.method === "GET" && request.url === "/api/listings") {
+    const result = await listListings();
+
+    if (typeof result === "string") {
+      response.writeHead(200, { "Content-Type": "text/plain" });
+      response.end(result);
+      return;
+    }
+
+    response.writeHead(result.statusCode ?? 200, result.headers as Record<string, string>);
+    response.end(result.body);
     return;
   }
 
@@ -44,7 +59,7 @@ const server = createServer(async (request, response) => {
   }
 
   const body = await getRequestBody(request);
-  const result = await handler({
+  const result = await createListing({
     body,
     headers: request.headers as Record<string, string>,
     isBase64Encoded: false,

@@ -8,6 +8,7 @@ export default function handler(
     service: "aws-listing-migration-backend",
     status: "ok",
     endpoints: {
+      listListings: "GET /api/listings",
       createListing: "POST /api/listings/create",
     },
   });

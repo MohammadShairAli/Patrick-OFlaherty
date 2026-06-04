@@ -29,6 +29,13 @@ provider:
             - arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:aws-listing-migration/${sls:stage}/*
 
 functions:
+  listListings:
+    handler: src/handlers/listListings.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /api/listings
+
   createListing:
     handler: src/handlers/createListing.handler
     events:

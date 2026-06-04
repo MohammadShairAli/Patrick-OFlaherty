@@ -13,6 +13,14 @@ export function created(body: Record<string, unknown>): APIGatewayProxyResultV2 
   };
 }
 
+export function ok(body: Record<string, unknown>): APIGatewayProxyResultV2 {
+  return {
+    body: JSON.stringify(body),
+    headers,
+    statusCode: 200,
+  };
+}
+
 export function validationError(errors: unknown[]): APIGatewayProxyResultV2 {
   return {
     body: JSON.stringify({

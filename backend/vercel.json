@@ -14,6 +14,10 @@
     {
       "src": "/api/listings/create",
       "dest": "/api/listings/create.ts"
+    },
+    {
+      "src": "/api/listings",
+      "dest": "/api/listings/index.ts"
     }
   ]
 }
