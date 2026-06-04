@@ -72,6 +72,18 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 Do not commit real `.env` files or database credentials.
 
+For a Vercel frontend-only demo, `NEXT_PUBLIC_API_URL` can be omitted. In that case the UI runs in demo mode and stores uploaded listings only in browser state. To connect a deployed backend later, add `NEXT_PUBLIC_API_URL` in Vercel with the public API Gateway/Lambda URL.
+
+For Vercel production environment variables, use:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://patrick-o-flaherty.vercel.app
+NEXT_PUBLIC_DEMO_MODE=true
+NEXT_PUBLIC_API_URL=
+```
+
+Do not upload `DATABASE_URL` to the Vercel frontend project. The database URL belongs only in the local backend `.env` or, later, in AWS Secrets Manager/Parameter Store for the Lambda backend.
+
 ## Supabase PostgreSQL Migrations
 
 This project uses Supabase only as a PostgreSQL database for the local demo. The target production database is AWS RDS PostgreSQL.

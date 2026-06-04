@@ -29,10 +29,18 @@ function isCreateListingError(
 }
 
 export async function createListing(payload: ListingPayload) {
-  const apiUrl =
-    process.env.NEXT_PUBLIC_API_URL ??
-    (process.env.NODE_ENV === "development" ? "http://localhost:3001" : "");
-  const endpoint = `${apiUrl.replace(/\/$/, "")}/api/listings/create`;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
+  if (isDemoMode || (!apiUrl && process.env.NODE_ENV !== "development")) {
+    return {
+      success: true,
+      listingId: `demo-${Date.now()}`,
+    } satisfies Extract<CreateListingResponse, { success: true }>;
+  }
+
+  const resolvedApiUrl = apiUrl ?? "http://localhost:3001";
+  const endpoint = `${resolvedApiUrl.replace(/\/$/, "")}/api/listings/create`;
 
   let response: Response;
 
