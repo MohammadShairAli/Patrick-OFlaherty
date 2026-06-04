@@ -1,0 +1,40 @@
+service: aws-listing-migration-poc
+
+frameworkVersion: "4"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${opt:region, "us-east-1"}
+  stage: ${opt:stage, "dev"}
+  environment:
+    DATABASE_URL: ${ssm:/aws-listing-migration/${sls:stage}/database-url}
+  logs:
+    httpApi: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+            - secretsmanager:GetSecretValue
+          Resource:
+            - arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/aws-listing-migration/${sls:stage}/*
+            - arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:aws-listing-migration/${sls:stage}/*
+
+functions:
+  createListing:
+    handler: src/handlers/createListing.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /api/listings/create
+
+plugins:
+  - serverless-esbuild
