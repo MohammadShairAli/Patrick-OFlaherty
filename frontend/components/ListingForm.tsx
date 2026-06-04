@@ -1,7 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { createListing, ListingPayload } from "../lib/api";
+import { FormEvent, useEffect, useState } from "react";
+import { createListing, getListings, ListingPayload } from "../lib/api";
 import { FormInput } from "./FormInput";
 import { SubmitButton } from "./SubmitButton";
 
@@ -22,44 +22,34 @@ type UploadedListing = ListingPayload & {
   createdAt: string;
 };
 
-const dummyUploadedListings: UploadedListing[] = [
-  {
-    sellerName: "Avery Johnson",
-    sellerEmail: "avery.johnson@example.com",
-    phone: "555-0142",
-    propertyAddress: "1842 Maple Ridge Drive",
-    city: "Austin",
-    state: "TX",
-    zip: "78703",
-    listPrice: 625000,
-    propertyType: "Single family",
-    selectedPackage: "Premium",
-    createdAt: "Demo data",
-  },
-  {
-    sellerName: "Morgan Lee",
-    sellerEmail: "morgan.lee@example.com",
-    phone: "555-0188",
-    propertyAddress: "92 Harbor View Lane",
-    city: "Tampa",
-    state: "FL",
-    zip: "33602",
-    listPrice: 410000,
-    propertyType: "Townhouse",
-    selectedPackage: "Standard",
-    createdAt: "Demo data",
-  },
-];
-
 export function ListingForm() {
   const [activeTab, setActiveTab] = useState<"form" | "uploaded">("form");
   const [form, setForm] = useState<ListingPayload>(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingListings, setIsLoadingListings] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadedListings, setUploadedListings] = useState<UploadedListing[]>(
-    dummyUploadedListings,
-  );
+  const [uploadedListings, setUploadedListings] = useState<UploadedListing[]>([]);
+
+  useEffect(() => {
+    async function loadListings() {
+      try {
+        const listings = await getListings();
+        setUploadedListings(
+          listings.map((listing) => ({
+            ...listing,
+            createdAt: new Date(listing.createdAt).toLocaleString(),
+          })),
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unable to load listings.");
+      } finally {
+        setIsLoadingListings(false);
+      }
+    }
+
+    void loadListings();
+  }, []);
 
   function updateField(name: keyof ListingPayload, value: string) {
     setForm((current) => ({
@@ -271,7 +261,11 @@ export function ListingForm() {
               </div>
             </div>
 
-            {uploadedListings.length === 0 ? (
+            {isLoadingListings ? (
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+                Loading listings from PostgreSQL...
+              </div>
+            ) : uploadedListings.length === 0 ? (
               <div className="rounded-md border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
                 No listing data has been uploaded yet.
               </div>

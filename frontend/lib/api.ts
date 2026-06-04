@@ -11,6 +11,11 @@ export type ListingPayload = {
   selectedPackage: string;
 };
 
+export type Listing = ListingPayload & {
+  id: string;
+  createdAt: string;
+};
+
 type CreateListingResponse =
   | {
       success: true;
@@ -22,6 +27,27 @@ type CreateListingResponse =
       errors?: unknown[];
     };
 
+type ListListingsResponse =
+  | {
+      success: true;
+      listings: Listing[];
+    }
+  | {
+      success: false;
+      message: string;
+    };
+
+function getApiConfig() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
+  return {
+    apiUrl,
+    isDemoMode,
+    resolvedApiUrl: apiUrl ?? "http://localhost:3001",
+  };
+}
+
 function isCreateListingError(
   data: CreateListingResponse,
 ): data is Extract<CreateListingResponse, { success: false }> {
@@ -29,8 +55,7 @@ function isCreateListingError(
 }
 
 export async function createListing(payload: ListingPayload) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
-  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  const { apiUrl, isDemoMode, resolvedApiUrl } = getApiConfig();
 
   if (isDemoMode || (!apiUrl && process.env.NODE_ENV !== "development")) {
     return {
@@ -39,7 +64,6 @@ export async function createListing(payload: ListingPayload) {
     } satisfies Extract<CreateListingResponse, { success: true }>;
   }
 
-  const resolvedApiUrl = apiUrl ?? "http://localhost:3001";
   const endpoint = `${resolvedApiUrl.replace(/\/$/, "")}/api/listings/create`;
 
   let response: Response;
@@ -75,4 +99,39 @@ export async function createListing(payload: ListingPayload) {
   }
 
   return data;
+}
+
+export async function getListings() {
+  const { apiUrl, isDemoMode, resolvedApiUrl } = getApiConfig();
+
+  if (isDemoMode || (!apiUrl && process.env.NODE_ENV !== "development")) {
+    return [];
+  }
+
+  const endpoint = `${resolvedApiUrl.replace(/\/$/, "")}/api/listings`;
+  let response: Response;
+
+  try {
+    response = await fetch(endpoint);
+  } catch {
+    throw new Error(`API is not reachable at ${endpoint}.`);
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+
+  if (!contentType.includes("application/json")) {
+    throw new Error("API did not return JSON while loading listings.");
+  }
+
+  const data = (await response.json()) as ListListingsResponse;
+
+  if ("message" in data) {
+    throw new Error(data.message);
+  }
+
+  if (!response.ok) {
+    throw new Error("Unable to load listings.");
+  }
+
+  return data.listings;
 }
