@@ -4,9 +4,9 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "strict": true,
     "target": "ES2022"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["api/**/*.ts", "src/**/*.ts"]
 }

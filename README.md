@@ -49,6 +49,44 @@ Vercel settings for this repo:
 
 Do not set the Output Directory to `public`. This is a Next.js app, not a static site. If Vercel shows `No Output Directory named "public" found after the Build completed`, remove `public` from the Output Directory setting and redeploy. The frontend also includes `frontend/vercel.json`, which sets the Vercel output directory to `.next`.
 
+## Optional Vercel Backend Demo
+
+The assessment backend remains AWS Lambda-ready, but it also includes a thin Vercel serverless adapter for demonstrating the complete workflow online.
+
+Create a second Vercel project from the same repository with these settings:
+
+- Project name: `patrick-backend` or similar
+- Root Directory: `backend`
+- Framework Preset: `Other`
+- Build Command: leave empty/default
+- Output Directory: leave empty/default
+- Install Command: `npm install`
+
+Do not set the backend Output Directory to `public`. The backend deploys as a serverless function from `backend/api/listings/create.ts`.
+
+Add this environment variable to the Vercel backend project:
+
+```env
+DATABASE_URL=your-supabase-postgresql-connection-string
+```
+
+For Vercel serverless deployments, use the Supabase connection-pooler URL when available. Never commit or expose the database password.
+
+After deploying the backend, test:
+
+```text
+https://YOUR-BACKEND-PROJECT.vercel.app/api/listings/create
+```
+
+Then update the Vercel frontend project environment variables:
+
+```env
+NEXT_PUBLIC_API_URL=https://YOUR-BACKEND-PROJECT.vercel.app
+NEXT_PUBLIC_DEMO_MODE=false
+```
+
+Redeploy the frontend after changing its environment variables.
+
 ## Environment Variables
 
 - `DATABASE_URL`: PostgreSQL connection string used by the backend.
