@@ -10,6 +10,7 @@ export default function Home() {
               <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
                 AWS Migration PoC
               </p>
+              
               <h1 className="mt-2 text-2xl font-bold text-slate-950 sm:text-3xl">
                 Property Listing Intake
               </h1>
